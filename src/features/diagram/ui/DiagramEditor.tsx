@@ -6,13 +6,16 @@ import {
   ReactFlow,
   ReactFlowProvider,
   type Edge,
+  type EdgeTypes,
   type Node,
+  type NodeChange,
+  type NodeTypes,
   useReactFlow,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { useCallback, useMemo } from 'react'
 import { ARROW_TYPE_COLORS, ARROW_TYPE_LABELS, SNAP_GRID } from '@/entities/idef0/constants'
-import { toFlowEdges, toFlowNodes, type FlowNodeData } from '@/features/diagram/lib/flowMappers'
+import { toFlowEdges, toFlowNodes } from '@/features/diagram/lib/flowMappers'
 import {
   useCurrentDiagram,
   useCurrentPath,
@@ -25,21 +28,21 @@ import { FunctionNode } from '@/features/diagram/ui/FunctionNode'
 const nodeTypes = {
   idef0Function: FunctionNode,
   boundaryPort: BoundaryPortNode,
-}
+} as unknown as NodeTypes
 
 const edgeTypes = {
   idef0Arrow: ArrowEdge,
-}
+} as unknown as EdgeTypes
 
 interface EditorCanvasProps {
   canvasRef: React.RefObject<HTMLDivElement | null>
-  onFlowNodesChange: (nodes: Node<FlowNodeData>[]) => void
+  onFlowNodesChange: (nodes: Node[]) => void
 }
 
 const EditorCanvas = ({ canvasRef, onFlowNodesChange }: EditorCanvasProps) => {
   const diagram = useCurrentDiagram()
   const path = useCurrentPath()
-  const reactFlow = useReactFlow<FlowNodeData, Edge>()
+  const reactFlow = useReactFlow()
   const {
     connectArrow,
     createContextFunction,
@@ -74,7 +77,7 @@ const EditorCanvas = ({ canvasRef, onFlowNodesChange }: EditorCanvasProps) => {
   }, [nodes, onFlowNodesChange])
 
   const handlePaneContextMenu = useCallback(
-    (event: React.MouseEvent) => {
+    (event: MouseEvent | React.MouseEvent) => {
       event.preventDefault()
       const position = reactFlow.screenToFlowPosition({ x: event.clientX, y: event.clientY })
       setContextMenu({
@@ -89,7 +92,7 @@ const EditorCanvas = ({ canvasRef, onFlowNodesChange }: EditorCanvasProps) => {
   )
 
   const handleNodeContextMenu = useCallback(
-    (event: React.MouseEvent, node: Node<FlowNodeData>) => {
+    (event: React.MouseEvent, node: Node) => {
       event.preventDefault()
       const position = reactFlow.screenToFlowPosition({ x: event.clientX, y: event.clientY })
       setSelection({ nodeIds: [node.id], arrowIds: [] })
@@ -192,9 +195,14 @@ const EditorCanvas = ({ canvasRef, onFlowNodesChange }: EditorCanvasProps) => {
           deleteKeyCode={null}
           onInit={updateExportNodes}
           onNodesChange={(changes) => {
-            const positions = changes
-              .filter((change): change is Extract<typeof changes[number], { type: 'position'; position: { x: number; y: number } }> =>
-                change.type === 'position' && Boolean(change.position),
+            const positions = (changes as NodeChange[])
+              .filter(
+                (
+                  change,
+                ): change is NodeChange & {
+                  type: 'position'
+                  position: { x: number; y: number }
+                } => change.type === 'position' && Boolean(change.position),
               )
               .map((change) => ({ id: change.id, x: change.position.x, y: change.position.y }))
 
@@ -303,7 +311,7 @@ const EditorCanvas = ({ canvasRef, onFlowNodesChange }: EditorCanvasProps) => {
 
 interface DiagramEditorProps {
   canvasRef: React.RefObject<HTMLDivElement | null>
-  onFlowNodesChange: (nodes: Node<FlowNodeData>[]) => void
+  onFlowNodesChange: (nodes: Node[]) => void
 }
 
 export const DiagramEditor = ({ canvasRef, onFlowNodesChange }: DiagramEditorProps) => (

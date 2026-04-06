@@ -1,10 +1,13 @@
 import { Handle, Position, type NodeProps } from '@xyflow/react'
 import { BOUNDARY_HANDLES, ARROW_TYPE_LABELS } from '@/entities/idef0/constants'
 import type { BoundaryNodeData } from '@/features/diagram/lib/flowMappers'
+import type { Node } from '@xyflow/react'
 
 const handleClassName = 'h-3 w-3 rounded-full border-2 border-slate-700 bg-white'
 
-export const BoundaryPortNode = ({ data, selected }: NodeProps<BoundaryNodeData>) => {
+type BoundaryFlowNode = Node<BoundaryNodeData, 'boundaryPort'>
+
+export const BoundaryPortNode = ({ data, selected }: NodeProps<BoundaryFlowNode>) => {
   const { node } = data
   const role = node.boundaryRole ?? 'input'
 

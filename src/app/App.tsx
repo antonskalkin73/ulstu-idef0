@@ -3,9 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { LeftSidebar } from '@/components/LeftSidebar'
 import { RightSidebar } from '@/components/RightSidebar'
 import { TopBar } from '@/components/TopBar'
-import type { FlowNodeData } from '@/features/diagram/lib/flowMappers'
 import { DiagramEditor } from '@/features/diagram/ui/DiagramEditor'
-import { exportDiagramToPdf, exportDiagramToPng, exportDiagramToSvg } from '@/features/export/lib/exportDiagram'
 import { useCurrentDiagram, useIdef0Store } from '@/features/diagram/model/useIdef0Store'
 import { downloadProjectJson, parseProjectJson } from '@/features/project/lib/projectFile'
 import {
@@ -26,7 +24,7 @@ const isEditableTarget = (target: EventTarget | null): boolean => {
 const App = () => {
   const canvasRef = useRef<HTMLDivElement | null>(null)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const [flowNodes, setFlowNodes] = useState<Node<FlowNodeData>[]>([])
+  const [flowNodes, setFlowNodes] = useState<Node[]>([])
   const currentDiagram = useCurrentDiagram()
   const {
     project,
@@ -169,6 +167,10 @@ const App = () => {
         window.alert('На диаграмме нет элементов для экспорта.')
         return
       }
+
+      const { exportDiagramToPdf, exportDiagramToPng, exportDiagramToSvg } = await import(
+        '@/features/export/lib/exportDiagram'
+      )
 
       if (type === 'png') {
         await exportDiagramToPng(element, flowNodes, `${exportFilePrefix}.png`)

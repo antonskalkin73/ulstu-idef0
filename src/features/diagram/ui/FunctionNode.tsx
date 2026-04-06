@@ -1,10 +1,13 @@
 import { Handle, Position, type NodeProps } from '@xyflow/react'
 import { FUNCTION_HANDLES } from '@/entities/idef0/constants'
 import type { FunctionNodeData } from '@/features/diagram/lib/flowMappers'
+import type { Node } from '@xyflow/react'
 
 const handleClassName = 'h-3 w-3 rounded-full border-2 border-slate-700 bg-white'
 
-export const FunctionNode = ({ data, selected }: NodeProps<FunctionNodeData>) => {
+type FunctionFlowNode = Node<FunctionNodeData, 'idef0Function'>
+
+export const FunctionNode = ({ data, selected }: NodeProps<FunctionFlowNode>) => {
   const { node } = data
 
   return (

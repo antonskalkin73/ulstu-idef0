@@ -3,21 +3,23 @@ import { MarkerType } from '@xyflow/react'
 import { ARROW_TYPE_COLORS } from '@/entities/idef0/constants'
 import type { IDEF0Arrow, IDEF0Diagram, IDEF0Node } from '@/types/idef0'
 
-export interface FunctionNodeData {
+export interface FunctionNodeData extends Record<string, unknown> {
   node: IDEF0Node
 }
 
-export interface BoundaryNodeData {
+export interface BoundaryNodeData extends Record<string, unknown> {
   node: IDEF0Node
 }
 
-export interface ArrowEdgeData {
+export interface ArrowEdgeData extends Record<string, unknown> {
   arrow: IDEF0Arrow
 }
 
 export type FlowNodeData = FunctionNodeData | BoundaryNodeData
+export type FlowNode = Node<FlowNodeData>
+export type FlowEdge = Edge<ArrowEdgeData>
 
-export const toFlowNodes = (diagram: IDEF0Diagram): Node<FlowNodeData>[] =>
+export const toFlowNodes = (diagram: IDEF0Diagram): FlowNode[] =>
   diagram.nodes.map((node) => ({
     id: node.id,
     type: node.kind === 'function' ? 'idef0Function' : 'boundaryPort',
@@ -29,7 +31,7 @@ export const toFlowNodes = (diagram: IDEF0Diagram): Node<FlowNodeData>[] =>
     selectable: true,
   }))
 
-export const toFlowEdges = (diagram: IDEF0Diagram): Edge<ArrowEdgeData>[] =>
+export const toFlowEdges = (diagram: IDEF0Diagram): FlowEdge[] =>
   diagram.arrows.map((arrow) => ({
     id: arrow.id,
     source: arrow.source,

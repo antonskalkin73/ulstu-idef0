@@ -1,4 +1,4 @@
-import { Layers3, MapTree, PlusSquare } from 'lucide-react'
+import { GitBranch, Layers3, PlusSquare } from 'lucide-react'
 import type { IDEF0Diagram } from '@/types/idef0'
 
 interface LeftSidebarProps {
@@ -78,7 +78,7 @@ export const LeftSidebar = ({
   <aside className="flex h-full flex-col gap-4 rounded-2xl border border-line bg-panel p-4 shadow-panel">
     <section>
       <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-900">
-        <MapTree className="h-4 w-4" /> Дерево диаграмм
+        <GitBranch className="h-4 w-4" /> Дерево диаграмм
       </div>
       <div className="space-y-1 rounded-xl bg-slate-50 p-2">
         {diagrams

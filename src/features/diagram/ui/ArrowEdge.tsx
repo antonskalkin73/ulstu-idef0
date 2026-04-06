@@ -1,6 +1,8 @@
-import { BaseEdge, EdgeLabelRenderer, getBezierPath, type EdgeProps } from '@xyflow/react'
+import { BaseEdge, EdgeLabelRenderer, getBezierPath, type Edge, type EdgeProps } from '@xyflow/react'
 import { ARROW_TYPE_COLORS, ARROW_TYPE_LABELS } from '@/entities/idef0/constants'
 import type { ArrowEdgeData } from '@/features/diagram/lib/flowMappers'
+
+type ArrowFlowEdge = Edge<ArrowEdgeData, 'idef0Arrow'>
 
 export const ArrowEdge = ({
   id,
@@ -13,7 +15,7 @@ export const ArrowEdge = ({
   data,
   selected,
   markerEnd,
-}: EdgeProps<ArrowEdgeData>) => {
+}: EdgeProps<ArrowFlowEdge>) => {
   const [path, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,

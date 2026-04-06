@@ -11,7 +11,7 @@ export const parseProjectJson = (content: string): IDEF0Project => {
     throw new Error('Некорректный JSON проекта IDEF0')
   }
 
-  return parsed as IDEF0Project
+  return parsed as unknown as IDEF0Project
 }
 
 export const serializeProject = (project: IDEF0Project): string => JSON.stringify(project, null, 2)

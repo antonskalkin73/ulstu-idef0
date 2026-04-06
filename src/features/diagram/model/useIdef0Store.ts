@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
 import type { Connection } from '@xyflow/react'
 import { BOUNDARY_HANDLES, FUNCTION_HANDLES } from '@/entities/idef0/constants'
 import { createBoundaryPortNode, createChildDiagram, createEmptyProject, createFunctionNode } from '@/features/project/lib/projectFactory'
@@ -82,6 +83,9 @@ interface Idef0Store {
 const buildIssues = (project: IDEF0Project): ValidationIssue[] => validateProject(project)
 
 const initialProject = createEmptyProject()
+
+const areStringArraysEqual = (left: string[], right: string[]): boolean =>
+  left.length === right.length && left.every((item, index) => item === right[index])
 
 const applyMutation = (
   state: Idef0Store,
@@ -375,7 +379,15 @@ export const useIdef0Store = create<Idef0Store>((set, get) => ({
     )
   },
   setSelection: (selection) => {
-    const currentDiagramId = get().currentDiagramId
+    const state = get()
+    if (
+      areStringArraysEqual(state.selection.nodeIds, selection.nodeIds) &&
+      areStringArraysEqual(state.selection.arrowIds, selection.arrowIds)
+    ) {
+      return
+    }
+
+    const currentDiagramId = state.currentDiagramId
     const selectedElement = selection.nodeIds[0]
       ? { kind: 'node' as const, id: selection.nodeIds[0] }
       : selection.arrowIds[0]
@@ -458,4 +470,4 @@ export const useCurrentDiagram = () =>
   useIdef0Store((state) => getDiagramById(state.project.diagrams, state.currentDiagramId))
 
 export const useCurrentPath = () =>
-  useIdef0Store((state) => getDiagramPath(state.project.diagrams, state.currentDiagramId))
+  useIdef0Store(useShallow((state) => getDiagramPath(state.project.diagrams, state.currentDiagramId)))

@@ -1,4 +1,5 @@
 import { AlertTriangle, ArrowRightLeft, Box, GitBranchPlus } from 'lucide-react'
+import { useShallow } from 'zustand/react/shallow'
 import { ARROW_TYPE_LABELS } from '@/entities/idef0/constants'
 import { useCurrentDiagram, useIdef0Store } from '@/features/diagram/model/useIdef0Store'
 import type { ValidationIssue } from '@/types/idef0'
@@ -10,13 +11,13 @@ interface RightSidebarProps {
 export const RightSidebar = ({ issues }: RightSidebarProps) => {
   const diagram = useCurrentDiagram()
   const { selectedElement, updateNode, updateArrow, updateDiagramTitle, openDecomposition } = useIdef0Store(
-    (state) => ({
+    useShallow((state) => ({
       selectedElement: state.selectedElement,
       updateNode: state.updateNode,
       updateArrow: state.updateArrow,
       updateDiagramTitle: state.updateDiagramTitle,
       openDecomposition: state.openDecomposition,
-    }),
+    })),
   )
 
   const selectedNode =

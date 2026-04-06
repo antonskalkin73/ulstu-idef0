@@ -1,5 +1,6 @@
 import type { Node } from '@xyflow/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 import { LeftSidebar } from '@/components/LeftSidebar'
 import { RightSidebar } from '@/components/RightSidebar'
 import { TopBar } from '@/components/TopBar'
@@ -45,26 +46,28 @@ const App = () => {
     undo,
     redo,
     deleteSelection,
-  } = useIdef0Store((state) => ({
-    project: state.project,
-    currentDiagramId: state.currentDiagramId,
-    issues: state.issues,
-    past: state.past,
-    future: state.future,
-    setProject: state.setProject,
-    newProject: state.newProject,
-    setProjectName: state.setProjectName,
-    navigateToDiagram: state.navigateToDiagram,
-    createContextFunction: state.createContextFunction,
-    addFunctionNode: state.addFunctionNode,
-    addBoundaryNode: state.addBoundaryNode,
-    toggleStrictMode: state.toggleStrictMode,
-    toggleSnapToGrid: state.toggleSnapToGrid,
-    toggleMiniMap: state.toggleMiniMap,
-    undo: state.undo,
-    redo: state.redo,
-    deleteSelection: state.deleteSelection,
-  }))
+  } = useIdef0Store(
+    useShallow((state) => ({
+      project: state.project,
+      currentDiagramId: state.currentDiagramId,
+      issues: state.issues,
+      past: state.past,
+      future: state.future,
+      setProject: state.setProject,
+      newProject: state.newProject,
+      setProjectName: state.setProjectName,
+      navigateToDiagram: state.navigateToDiagram,
+      createContextFunction: state.createContextFunction,
+      addFunctionNode: state.addFunctionNode,
+      addBoundaryNode: state.addBoundaryNode,
+      toggleStrictMode: state.toggleStrictMode,
+      toggleSnapToGrid: state.toggleSnapToGrid,
+      toggleMiniMap: state.toggleMiniMap,
+      undo: state.undo,
+      redo: state.redo,
+      deleteSelection: state.deleteSelection,
+    })),
+  )
 
   const exportFilePrefix = useMemo(
     () => `${project.name.replace(/\s+/g, '-').toLowerCase()}-${currentDiagram?.nodeNumber ?? currentDiagramId}`,

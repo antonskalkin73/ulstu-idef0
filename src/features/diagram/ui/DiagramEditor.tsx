@@ -14,6 +14,7 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { useCallback, useMemo } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 import { ARROW_TYPE_COLORS, ARROW_TYPE_LABELS, SNAP_GRID } from '@/entities/idef0/constants'
 import { toFlowEdges, toFlowNodes } from '@/features/diagram/lib/flowMappers'
 import {
@@ -55,19 +56,21 @@ const EditorCanvas = ({ canvasRef, onFlowNodesChange }: EditorCanvasProps) => {
     removeElement,
     updateNodePositions,
     project,
-  } = useIdef0Store((state) => ({
-    connectArrow: state.connectArrow,
-    createContextFunction: state.createContextFunction,
-    addFunctionNode: state.addFunctionNode,
-    addBoundaryNode: state.addBoundaryNode,
-    setSelection: state.setSelection,
-    setContextMenu: state.setContextMenu,
-    contextMenu: state.contextMenu,
-    openDecomposition: state.openDecomposition,
-    removeElement: state.removeElement,
-    updateNodePositions: state.updateNodePositions,
-    project: state.project,
-  }))
+  } = useIdef0Store(
+    useShallow((state) => ({
+      connectArrow: state.connectArrow,
+      createContextFunction: state.createContextFunction,
+      addFunctionNode: state.addFunctionNode,
+      addBoundaryNode: state.addBoundaryNode,
+      setSelection: state.setSelection,
+      setContextMenu: state.setContextMenu,
+      contextMenu: state.contextMenu,
+      openDecomposition: state.openDecomposition,
+      removeElement: state.removeElement,
+      updateNodePositions: state.updateNodePositions,
+      project: state.project,
+    })),
+  )
 
   const nodes = useMemo(() => (diagram ? toFlowNodes(diagram) : []), [diagram])
   const edges = useMemo(() => (diagram ? toFlowEdges(diagram) : []), [diagram])

@@ -1,0 +1,161 @@
+import {
+  BOUNDARY_HANDLES,
+  FUNCTION_HANDLES,
+} from '@/entities/idef0/constants'
+import type { ArrowType, IDEF0Arrow, IDEF0Diagram, IDEF0Node } from '@/types/idef0'
+
+export const cloneProject = <T>(value: T): T => structuredClone(value)
+
+export const getDiagramById = (diagrams: IDEF0Diagram[], diagramId: string): IDEF0Diagram | undefined =>
+  diagrams.find((diagram) => diagram.id === diagramId)
+
+export const getNodeById = (diagram: IDEF0Diagram, nodeId: string): IDEF0Node | undefined =>
+  diagram.nodes.find((node) => node.id === nodeId)
+
+export const getFunctionNodes = (diagram: IDEF0Diagram): IDEF0Node[] =>
+  diagram.nodes.filter((node) => node.kind === 'function')
+
+export const getDiagramPath = (diagrams: IDEF0Diagram[], diagramId: string): IDEF0Diagram[] => {
+  const path: IDEF0Diagram[] = []
+  let cursor = getDiagramById(diagrams, diagramId)
+
+  while (cursor) {
+    path.unshift(cursor)
+    cursor = cursor.parentDiagramId ? getDiagramById(diagrams, cursor.parentDiagramId) : undefined
+  }
+
+  return path
+}
+
+export const getNextFunctionNumber = (diagram: IDEF0Diagram, parentNode?: IDEF0Node): string => {
+  const functionNodes = getFunctionNodes(diagram)
+  const usedNumbers = functionNodes
+    .map((node) => node.nodeNumber)
+    .filter((value): value is string => Boolean(value))
+
+  if (diagram.isContext) {
+    if (!usedNumbers.includes('A0')) {
+      return 'A0'
+    }
+
+    let index = 1
+    while (usedNumbers.includes(`A${index}`)) {
+      index += 1
+    }
+
+    return `A${index}`
+  }
+
+  const prefix = parentNode?.nodeNumber ?? diagram.nodeNumber
+  let index = 1
+
+  while (usedNumbers.includes(`${prefix}${index}`)) {
+    index += 1
+  }
+
+  return `${prefix}${index}`
+}
+
+export const getArrowTypeFromHandles = (
+  source: IDEF0Node,
+  target: IDEF0Node,
+  sourceHandle?: string | null,
+  targetHandle?: string | null,
+): ArrowType | null => {
+  if (source.kind === 'boundaryPort' && source.boundaryRole && source.boundaryRole !== 'output') {
+    return source.boundaryRole
+  }
+
+  if (target.kind === 'boundaryPort' && target.boundaryRole === 'output') {
+    return 'output'
+  }
+
+  switch (targetHandle) {
+    case FUNCTION_HANDLES.inputTarget:
+      return 'input'
+    case FUNCTION_HANDLES.controlTarget:
+      return 'control'
+    case FUNCTION_HANDLES.mechanismTarget:
+      return 'mechanism'
+    case BOUNDARY_HANDLES.outputTarget:
+      return 'output'
+    default:
+      return sourceHandle === FUNCTION_HANDLES.outputSource ? 'output' : null
+  }
+}
+
+export const isArrowSemanticallyValid = (
+  source: IDEF0Node,
+  target: IDEF0Node,
+  arrowType: ArrowType,
+  sourceHandle: string,
+  targetHandle: string,
+): boolean => {
+  if (source.kind === 'function') {
+    if (sourceHandle !== FUNCTION_HANDLES.outputSource) {
+      return false
+    }
+
+    if (target.kind === 'function') {
+      const expectedHandle =
+        arrowType === 'input'
+          ? FUNCTION_HANDLES.inputTarget
+          : arrowType === 'control'
+            ? FUNCTION_HANDLES.controlTarget
+            : arrowType === 'mechanism'
+              ? FUNCTION_HANDLES.mechanismTarget
+              : ''
+
+      return expectedHandle !== '' && targetHandle === expectedHandle
+    }
+
+    return arrowType === 'output' && target.boundaryRole === 'output' && targetHandle === BOUNDARY_HANDLES.outputTarget
+  }
+
+  if (!source.boundaryRole || source.boundaryRole === 'output') {
+    return false
+  }
+
+  if (target.kind !== 'function') {
+    return false
+  }
+
+  const expectedTarget =
+    arrowType === 'input'
+      ? FUNCTION_HANDLES.inputTarget
+      : arrowType === 'control'
+        ? FUNCTION_HANDLES.controlTarget
+        : FUNCTION_HANDLES.mechanismTarget
+
+  return source.boundaryRole === arrowType && sourceHandle === BOUNDARY_HANDLES.sourceOutput && targetHandle === expectedTarget
+}
+
+export const getIncomingArrows = (diagram: IDEF0Diagram, nodeId: string, arrowType?: ArrowType): IDEF0Arrow[] =>
+  diagram.arrows.filter(
+    (arrow) => arrow.target === nodeId && (!arrowType || arrow.arrowType === arrowType),
+  )
+
+export const getOutgoingArrows = (diagram: IDEF0Diagram, nodeId: string): IDEF0Arrow[] =>
+  diagram.arrows.filter((arrow) => arrow.source === nodeId)
+
+export const collectChildDiagramIds = (
+  diagrams: IDEF0Diagram[],
+  startDiagramId: string,
+): string[] => {
+  const children = diagrams.filter((diagram) => diagram.parentDiagramId === startDiagramId)
+  const nested = children.flatMap((diagram) => collectChildDiagramIds(diagrams, diagram.id))
+  return [startDiagramId, ...nested]
+}
+
+export const downloadBlob = (blob: Blob, fileName: string): void => {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+export const downloadTextFile = (content: string, fileName: string, mimeType: string): void => {
+  downloadBlob(new Blob([content], { type: mimeType }), fileName)
+}

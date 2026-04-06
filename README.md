@@ -47,6 +47,16 @@ docker-compose up --build
 
 После запуска приложение доступно на `http://localhost:8080`.
 
+## Публикация контейнера в GHCR
+
+В репозитории настроен workflow `.github/workflows/publish-container.yml`, который:
+
+- собирает контейнер из `Dockerfile`;
+- публикует образ в GitHub Container Registry (`ghcr.io`);
+- запускается вручную через `workflow_dispatch`, а также автоматически при push в `main` и при push тега `v*`.
+
+Основной образ публикуется как `ghcr.io/antonskalkin73/ulstu-idef0:latest`, а также с тегами ветки, git-тега и SHA коммита.
+
 ## Структура каталогов
 
 ```text

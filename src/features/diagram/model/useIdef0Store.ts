@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
 import type { Connection } from '@xyflow/react'
 import { BOUNDARY_HANDLES, FUNCTION_HANDLES } from '@/entities/idef0/constants'
 import { createBoundaryPortNode, createChildDiagram, createEmptyProject, createFunctionNode } from '@/features/project/lib/projectFactory'
@@ -458,4 +459,4 @@ export const useCurrentDiagram = () =>
   useIdef0Store((state) => getDiagramById(state.project.diagrams, state.currentDiagramId))
 
 export const useCurrentPath = () =>
-  useIdef0Store((state) => getDiagramPath(state.project.diagrams, state.currentDiagramId))
+  useIdef0Store(useShallow((state) => getDiagramPath(state.project.diagrams, state.currentDiagramId)))

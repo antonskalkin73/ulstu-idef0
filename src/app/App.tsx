@@ -199,9 +199,9 @@ const App = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 px-4 py-4 text-slate-900">
+    <div className="h-dvh overflow-hidden bg-slate-100 px-4 py-4 text-slate-900">
       <input ref={fileInputRef} type="file" accept="application/json" className="hidden" onChange={handleImportJson} />
-      <div className="mx-auto flex max-w-[1800px] flex-col gap-4">
+      <div className="mx-auto flex h-full max-w-[1800px] min-h-0 flex-col gap-4">
         <TopBar
           projectName={project.name}
           onProjectNameChange={setProjectName}
@@ -220,7 +220,7 @@ const App = () => {
           onToggleStrictMode={toggleStrictMode}
         />
 
-        <div className="grid min-h-[calc(100vh-116px)] grid-cols-1 gap-4 xl:grid-cols-[320px_minmax(0,1fr)_360px]">
+        <div className="grid min-h-0 flex-1 overflow-hidden grid-cols-1 gap-4 xl:grid-cols-[320px_minmax(0,1fr)_360px]">
           <LeftSidebar
             diagrams={project.diagrams}
             currentDiagramId={currentDiagramId}

@@ -157,7 +157,7 @@ const EditorCanvas = ({ canvasRef, onFlowNodesChange }: EditorCanvasProps) => {
   )
 
   return (
-    <div className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-canvas shadow-panel">
+    <div className="relative flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-line bg-canvas shadow-panel">
       <div className="flex items-center justify-between border-b border-line bg-white px-4 py-3">
         <div>
           <div className="text-sm font-semibold text-slate-900">{diagram?.title}</div>
@@ -218,17 +218,24 @@ const EditorCanvas = ({ canvasRef, onFlowNodesChange }: EditorCanvasProps) => {
             }
           }}
           onNodeDoubleClick={(_, node) => openDecomposition(node.id)}
-          onSelectionChange={({ nodes: selectedNodes, edges: selectedEdges }) =>
+          onSelectionChange={({ nodes: selectedNodes, edges: selectedEdges }) => {
+            if (selectedNodes.length === 0 && selectedEdges.length === 0) {
+              return
+            }
+
             setSelection({
               nodeIds: selectedNodes.map((node) => node.id),
               arrowIds: selectedEdges.map((edge) => edge.id),
             })
-          }
+          }}
           onPaneContextMenu={handlePaneContextMenu}
           onNodeContextMenu={handleNodeContextMenu}
           onEdgeContextMenu={handleEdgeContextMenu}
           onMoveEnd={updateExportNodes}
-          onPaneClick={() => setContextMenu(null)}
+          onPaneClick={() => {
+            setSelection({ nodeIds: [], arrowIds: [] })
+            setContextMenu(null)
+          }}
         >
           <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#cbd5e1" />
           {project.settings.showMiniMap ? (

@@ -1,4 +1,5 @@
 import { AlertTriangle, ArrowRightLeft, Box, GitBranchPlus } from 'lucide-react'
+import { useShallow } from 'zustand/react/shallow'
 import { ARROW_TYPE_LABELS } from '@/entities/idef0/constants'
 import { useCurrentDiagram, useIdef0Store } from '@/features/diagram/model/useIdef0Store'
 import type { ValidationIssue } from '@/types/idef0'
@@ -10,13 +11,13 @@ interface RightSidebarProps {
 export const RightSidebar = ({ issues }: RightSidebarProps) => {
   const diagram = useCurrentDiagram()
   const { selectedElement, updateNode, updateArrow, updateDiagramTitle, openDecomposition } = useIdef0Store(
-    (state) => ({
+    useShallow((state) => ({
       selectedElement: state.selectedElement,
       updateNode: state.updateNode,
       updateArrow: state.updateArrow,
       updateDiagramTitle: state.updateDiagramTitle,
       openDecomposition: state.openDecomposition,
-    }),
+    })),
   )
 
   const selectedNode =
@@ -26,7 +27,7 @@ export const RightSidebar = ({ issues }: RightSidebarProps) => {
   const diagramIssues = diagram ? issues.filter((issue) => issue.diagramId === diagram.id) : []
 
   return (
-    <aside className="flex h-full flex-col gap-4 rounded-2xl border border-line bg-panel p-4 shadow-panel">
+    <aside className="flex h-full min-h-0 flex-col gap-4 rounded-2xl border border-line bg-panel p-4 shadow-panel">
       <section className="rounded-xl border border-slate-200 p-4">
         <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-900">
           {selectedNode ? <Box className="h-4 w-4" /> : selectedArrow ? <ArrowRightLeft className="h-4 w-4" /> : <GitBranchPlus className="h-4 w-4" />}

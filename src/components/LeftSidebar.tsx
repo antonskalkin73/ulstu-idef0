@@ -75,12 +75,12 @@ export const LeftSidebar = ({
   onToggleSnapToGrid,
   onToggleMiniMap,
 }: LeftSidebarProps) => (
-  <aside className="flex h-full flex-col gap-4 rounded-2xl border border-line bg-panel p-4 shadow-panel">
-    <section>
+  <aside className="flex h-full min-h-0 flex-col gap-4 overflow-hidden rounded-2xl border border-line bg-panel p-4 shadow-panel">
+    <section className="min-h-0 flex-1">
       <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-900">
         <GitBranch className="h-4 w-4" /> Дерево диаграмм
       </div>
-      <div className="space-y-1 rounded-xl bg-slate-50 p-2">
+      <div className="h-full overflow-auto rounded-xl bg-slate-50 p-2">
         {diagrams
           .filter((diagram) => diagram.parentDiagramId === null)
           .map((diagram) => (

@@ -39,6 +39,8 @@ npm run lint
 npm run build
 ```
 
+Папка `dist/` генерируется командой сборки и не хранится в репозитории.
+
 ## Запуск через Docker Compose
 
 ```bash
